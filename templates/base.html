@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}3DES Web App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <h2>3DES App</h2>
+            <button class="menu-btn" onclick="showSection('generate-key')">Tạo khóa</button>
+            <button class="menu-btn" onclick="showSection('encrypt-text')">Mã hóa chuỗi</button>
+            <button class="menu-btn" onclick="showSection('decrypt-text')">Giải mã chuỗi</button>
+            <button class="menu-btn" onclick="showSection('encrypt-file')">Mã hóa file TXT</button>
+            <button class="menu-btn" onclick="showSection('decrypt-file')">Giải mã file TXT</button>
+            <button class="menu-btn" onclick="showSection('list-keys')">Danh sách khóa</button>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <h1>Ứng dụng mã hóa và giải mã 3DES</h1>
+                <p>Thuật toán DES/3DES được tự cài đặt từ đầu, Flask chỉ dùng làm giao diện.</p>
+            </div>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.feature-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.style.display = 'block';
+            }
+
+            const buttons = document.querySelectorAll('.menu-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            const activeBtn = Array.from(buttons).find(btn =>
+                btn.getAttribute('onclick') === `showSection('${sectionId}')`
+            );
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        window.onload = function () {
+            showSection('generate-key');
+        };
+    </script>
+</body>
+</html>

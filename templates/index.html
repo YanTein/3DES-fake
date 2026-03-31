@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+
+<div id="generate-key" class="feature-section">
+    <div class="card">
+        <h2>Tạo khóa</h2>
+        <form action="/generate-key" method="post">
+            <label>Keynumber:</label>
+            <input type="text" name="keynumber" required>
+
+            <label>Seed:</label>
+            <input type="text" name="seed" required>
+
+            <button type="submit">Tạo và lưu khóa</button>
+        </form>
+    </div>
+</div>
+
+<div id="encrypt-text" class="feature-section">
+    <div class="card">
+        <h2>Mã hóa chuỗi</h2>
+        <form action="/encrypt-text" method="post">
+            <label>Keynumber:</label>
+            <input type="text" name="keynumber" required>
+
+            <label>Nhập chuỗi cần mã hóa:</label>
+            <textarea name="text_input" rows="8" required></textarea>
+
+            <button type="submit">Mã hóa chuỗi</button>
+        </form>
+    </div>
+</div>
+
+<div id="decrypt-text" class="feature-section">
+    <div class="card">
+        <h2>Giải mã chuỗi</h2>
+        <form action="/decrypt-text" method="post">
+            <label>Keynumber:</label>
+            <input type="text" name="keynumber" required>
+
+            <label>Nhập ciphertext dạng HEX:</label>
+            <textarea name="text_input" rows="8" required></textarea>
+
+            <button type="submit">Giải mã chuỗi</button>
+        </form>
+    </div>
+</div>
+
+<div id="encrypt-file" class="feature-section">
+    <div class="card">
+        <h2>Mã hóa file TXT</h2>
+        <form action="/encrypt-file" method="post" enctype="multipart/form-data">
+            <label>Keynumber:</label>
+            <input type="text" name="keynumber" required>
+
+            <label>Chọn file TXT:</label>
+            <input type="file" name="file_input" accept=".txt" required>
+
+            <button type="submit">Mã hóa file</button>
+        </form>
+    </div>
+</div>
+
+<div id="decrypt-file" class="feature-section">
+    <div class="card">
+        <h2>Giải mã file TXT</h2>
+        <form action="/decrypt-file" method="post" enctype="multipart/form-data">
+            <label>Keynumber:</label>
+            <input type="text" name="keynumber" required>
+
+            <label>Chọn file ciphertext:</label>
+            <input type="file" name="file_input" accept=".txt" required>
+
+            <button type="submit">Giải mã file</button>
+        </form>
+    </div>
+</div>
+
+<div id="list-keys" class="feature-section">
+    <div class="card">
+        <h2>Danh sách khóa</h2>
+        {% if keys %}
+            <div class="key-list">
+                {% for item in keys %}
+                    <div class="key-item">
+                        <div><strong>Keynumber:</strong> {{ item.keynumber }}</div>
+                        <div><strong>Key:</strong> {{ item.key }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Chưa có khóa nào.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

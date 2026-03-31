@@ -1,0 +1,5 @@
+link source backend: https://github.com/GiangNguyen22/certificate-management
+link source code Application: https://github.com/GiangNguyen22/student-management
+logger -n 10.21.7.34 -P 514 "TEST SYSLOG 514"
+10.129.131
+*.* @10.21.7.34:514

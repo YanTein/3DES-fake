@@ -1,0 +1,144 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: #1f2937;
+    color: white;
+    padding: 24px 16px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 24px;
+}
+
+.menu-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #374151;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.menu-btn:hover {
+    background: #4b5563;
+}
+
+.menu-btn.active {
+    background: #2563eb;
+}
+
+.main-content {
+    flex: 1;
+    padding: 32px;
+    box-sizing: border-box;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0 0 8px 0;
+    font-size: 30px;
+}
+
+.header p {
+    margin: 0;
+    color: #666;
+}
+
+.feature-section {
+    display: none;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+form input,
+form textarea,
+form button {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+form input,
+form textarea {
+    border: 1px solid #ccc;
+}
+
+form button,
+.back-btn {
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+form button:hover,
+.back-btn:hover {
+    background: #1d4ed8;
+}
+
+.key-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.key-item {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px;
+    word-break: break-all;
+}
+
+.result-box {
+    background: #111827;
+    color: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+}
