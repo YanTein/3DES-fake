@@ -5,7 +5,26 @@
 {% block content %}
 <div class="card">
     <h2>{{ title }}</h2>
+
+    {% if elapsed %}
+    <div class="timing-box">
+        <div class="timing-row">
+            <span class="timing-label">⚡ Thời gian {{ op }}</span>
+            <span class="timing-value">{{ elapsed }} giây</span>
+        </div>
+        <div class="timing-row">
+            <span class="timing-label">📦 Kích thước dữ liệu</span>
+            <span class="timing-value">{{ data_len }} byte</span>
+        </div>
+    </div>
+    {% endif %}
+
     <pre class="result-box">{{ result }}</pre>
+
+    {% if download_file %}
+    <a class="download-btn" href="/download/{{ download_file }}">⬇ Tải file kết quả</a>
+    {% endif %}
+
     <button class="back-btn" onclick="window.location.href='/'">Quay lại trang chủ</button>
 </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 # web_app.py
 
 import os
+import time
 from flask import Flask, render_template, request, send_file
 
 from bit_utils import bytes_to_hex, hex_to_bytes
@@ -60,7 +61,9 @@ def encrypt_text():
 
     try:
         key = load_key_from_file(KEY_FILE, keynumber)
+        t0 = time.perf_counter()
         cipher = triple_des_encrypt_bytes(text.encode("utf-8"), key)
+        elapsed = time.perf_counter() - t0
         cipher_hex = bytes_to_hex(cipher)
 
         output_path = os.path.join(OUTPUT_FOLDER, f"encrypted_text_{keynumber}.txt")
@@ -69,7 +72,10 @@ def encrypt_text():
         return render_template(
             "result.html",
             title="Kết quả mã hóa chuỗi",
-            result=cipher_hex
+            result=cipher_hex,
+            elapsed=f"{elapsed:.6f}",
+            op="Mã hóa",
+            data_len=len(text.encode("utf-8")),
         )
     except Exception as e:
         return render_template("result.html", title="Lỗi", result=str(e))
@@ -83,7 +89,9 @@ def decrypt_text():
     try:
         key = load_key_from_file(KEY_FILE, keynumber)
         cipher_bytes = hex_to_bytes(cipher_hex)
+        t0 = time.perf_counter()
         plain = triple_des_decrypt_bytes(cipher_bytes, key)
+        elapsed = time.perf_counter() - t0
         plain_text = plain.decode("utf-8")
 
         output_path = os.path.join(OUTPUT_FOLDER, f"decrypted_text_{keynumber}.txt")
@@ -92,7 +100,10 @@ def decrypt_text():
         return render_template(
             "result.html",
             title="Kết quả giải mã chuỗi",
-            result=plain_text
+            result=plain_text,
+            elapsed=f"{elapsed:.6f}",
+            op="Giải mã",
+            data_len=len(cipher_bytes),
         )
     except Exception as e:
         return render_template("result.html", title="Lỗi", result=str(e))
@@ -113,14 +124,25 @@ def encrypt_file():
         file.save(input_path)
 
         content = read_text_file(input_path)
-        cipher = triple_des_encrypt_bytes(content.encode("utf-8"), key)
+        plain_bytes = content.encode("utf-8")
+        t0 = time.perf_counter()
+        cipher = triple_des_encrypt_bytes(plain_bytes, key)
+        elapsed = time.perf_counter() - t0
         cipher_hex = bytes_to_hex(cipher)
 
         output_filename = "encrypted_" + file.filename
         output_path = os.path.join(OUTPUT_FOLDER, output_filename)
         write_text_file(output_path, cipher_hex)
 
-        return send_file(output_path, as_attachment=True)
+        return render_template(
+            "result.html",
+            title="Mã hóa file thành công",
+            result=f"File đã mã hóa: {output_filename}",
+            elapsed=f"{elapsed:.6f}",
+            op="Mã hóa file",
+            data_len=len(plain_bytes),
+            download_file=output_filename,
+        )
     except Exception as e:
         return render_template("result.html", title="Lỗi", result=str(e))
 
@@ -140,17 +162,33 @@ def decrypt_file():
         file.save(input_path)
 
         cipher_hex = read_text_file(input_path).strip()
-        plain = triple_des_decrypt_bytes(hex_to_bytes(cipher_hex), key)
+        cipher_bytes = hex_to_bytes(cipher_hex)
+        t0 = time.perf_counter()
+        plain = triple_des_decrypt_bytes(cipher_bytes, key)
+        elapsed = time.perf_counter() - t0
 
         output_filename = "decrypted_" + file.filename
         output_path = os.path.join(OUTPUT_FOLDER, output_filename)
-
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(plain.decode("utf-8"))
 
-        return send_file(output_path, as_attachment=True)
+        return render_template(
+            "result.html",
+            title="Giải mã file thành công",
+            result=f"File đã giải mã: {output_filename}",
+            elapsed=f"{elapsed:.6f}",
+            op="Giải mã file",
+            data_len=len(cipher_bytes),
+            download_file=output_filename,
+        )
     except Exception as e:
         return render_template("result.html", title="Lỗi", result=str(e))
+
+
+@app.route("/download/<filename>")
+def download(filename):
+    path = os.path.join(OUTPUT_FOLDER, filename)
+    return send_file(path, as_attachment=True)
 
 
 if __name__ == "__main__":
