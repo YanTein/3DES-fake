@@ -38,7 +38,9 @@ def triple_des_decrypt_bytes(cipher_data, master_key_24):
     if not isinstance(cipher_data, (bytes, bytearray)):
         raise TypeError("cipher_data phai la bytes hoac bytearray")
     if len(cipher_data) < 16 or len(cipher_data) % 8 != 0:
-        raise ValueError("Ciphertext CBC khong hop le: phai co it nhat 16 bytes va chia het cho 8")
+        raise ValueError(
+            "Ciphertext CBC khong hop le: toi thieu 16 bytes (8-byte IV + 8-byte block du lieu) va chia het cho 8"
+        )
 
     k1, k2, k3 = split_3des_key(master_key_24)
 
