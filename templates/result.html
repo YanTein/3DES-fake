@@ -4,8 +4,29 @@
 
 {% block content %}
 <div class="card">
-    <h2>{{ title }}</h2>
+    <div class="card-header">
+        <span class="card-icon">✅</span>
+        <h2>{{ title }}</h2>
+    </div>
+
+    {% if elapsed %}
+    <div class="stats-row">
+        <div class="stat-item">
+            <span class="stat-label">⏱ Thời gian xử lý</span>
+            <span class="stat-value highlight">{{ elapsed }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">📥 Kích thước đầu vào</span>
+            <span class="stat-value">{{ input_size }} bytes</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">📤 Kích thước đầu ra</span>
+            <span class="stat-value">{{ output_size }} bytes</span>
+        </div>
+    </div>
+    {% endif %}
+
     <pre class="result-box">{{ result }}</pre>
-    <button class="back-btn" onclick="window.location.href='/'">Quay lại trang chủ</button>
+    <a class="back-btn" href="/">← Quay lại trang chủ</a>
 </div>
 {% endblock %}

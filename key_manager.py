@@ -12,7 +12,14 @@ class SimpleLCG:
         return self.state & 0xFF
 
 
-def generate_3des_key(seed=123456789):
+def generate_3des_key(seed=None):
+    """Sinh khóa 3DES 24 byte.
+    - seed=None  → random thật sự (os.urandom)
+    - seed=<int> → reproducible bằng LCG (dùng cho demo/test)
+    """
+    if seed is None:
+        import os
+        return os.urandom(24)
     rng = SimpleLCG(seed)
     key = bytearray()
     for _ in range(24):

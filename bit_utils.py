@@ -158,3 +158,60 @@ def hex_to_bytes(hex_str):
         lo = hex_val(hex_str[i + 1])
         out.append((hi << 4) | lo)
     return bytes(out)
+
+
+# ── Base64 encode/decode (tự cài đặt) ────────────────────────────────────────
+
+_B64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+_B64_PAD   = "="
+
+
+def bytes_to_base64(data):
+    if not isinstance(data, (bytes, bytearray)):
+        raise TypeError("data phai la bytes hoac bytearray")
+
+    result = []
+    for i in range(0, len(data), 3):
+        chunk = data[i:i+3]
+        b = [c for c in chunk] + [0] * (3 - len(chunk))
+        n = (b[0] << 16) | (b[1] << 8) | b[2]
+        result.append(_B64_CHARS[(n >> 18) & 0x3F])
+        result.append(_B64_CHARS[(n >> 12) & 0x3F])
+        result.append(_B64_CHARS[(n >>  6) & 0x3F] if len(chunk) > 1 else _B64_PAD)
+        result.append(_B64_CHARS[ n        & 0x3F] if len(chunk) > 2 else _B64_PAD)
+
+    return "".join(result)
+
+
+def base64_to_bytes(b64_str):
+    if not isinstance(b64_str, str):
+        raise TypeError("b64_str phai la str")
+
+    b64_str = b64_str.strip().replace("\n", "").replace("\r", "").replace(" ", "")
+    if len(b64_str) % 4 != 0:
+        raise ValueError("Base64 string khong hop le (do dai phai chia het cho 4)")
+
+    _lookup = {c: i for i, c in enumerate(_B64_CHARS)}
+
+    result = bytearray()
+    for i in range(0, len(b64_str), 4):
+        c = b64_str[i:i+4]
+        if c[0] not in _lookup or c[1] not in _lookup:
+            raise ValueError(f"Ky tu Base64 khong hop le tai vi tri {i}")
+
+        n = (_lookup[c[0]] << 18) | (_lookup[c[1]] << 12)
+        result.append((n >> 16) & 0xFF)
+
+        if c[2] != _B64_PAD:
+            if c[2] not in _lookup:
+                raise ValueError(f"Ky tu Base64 khong hop le tai vi tri {i+2}")
+            n |= (_lookup[c[2]] << 6)
+            result.append((n >> 8) & 0xFF)
+
+        if c[3] != _B64_PAD:
+            if c[3] not in _lookup:
+                raise ValueError(f"Ky tu Base64 khong hop le tai vi tri {i+3}")
+            n |= _lookup[c[3]]
+            result.append(n & 0xFF)
+
+    return bytes(result)

@@ -1,0 +1,1221 @@
+﻿Sản xuất sản phẩm
+Lịch sử thay đổi
+
+
+Ngày
+	Người viết
+	Mô tả thay đổi
+	7/3/2026
+	Nguyễn Thị Minh Ánh
+	* Khởi tạo:
+* Thêm sản phẩm sản xuất
+* Tạo lệnh sản xuất
+* Xử lý các luồng liên quan: kho, bán hàng,...
+	
+
+Thuật nghĩa, thuật ngữ và viết tắt
+
+
+STT
+	Thuật ngữ, viết tắt
+	Ý nghĩa
+	1
+	SX
+	Sản xuất
+	2
+	NVL
+	Nguyên vật liệu
+	3
+	HT
+	Hệ thống
+	4
+	ND
+	Người dùng
+	
+
+Tổng quan
+1. Mục đích
+* Bổ sung tính năng sản xuất bán thành phẩm VD: nước cốt, trân châu,..để phục vụ các cửa hàng F&B: trà sữa, cafe,....
+2. Mục tiêu:
+* Quản lý lịch sử sản xuất bán thành phẩm (CRUD)
+* Quản lý giao dịch kho khi sản xuất
+* Quản lý sản phẩm
+* Xử lý các luồng bán hàng liên quan: bán hàng, hủy, trả,....
+3. Mô tả bài toán
+* Trong mô hình kinh doanh F&B, một số sản phẩm bán tại cửa hàng cần được chế biến trước khi phục vụ khách, ví dụ: trà sữa, nước uống, các loại sốt,...
+* Hàng ngày, khu vực bếp hoặc chi nhánh tổng sẽ tổng hợp nguyên liệu để sản xuất ra thành phẩm hoặc bán thành phẩm. Các sản phẩm này sau đó được cung cấp cho bộ phận bar/quầy pha chế để tiếp tục chế biến hoặc hoàn thiện món ăn, giúp phục vụ khách hàng nhanh chóng khi phát sinh đơn hàng tại cửa hàng
+                          
+
+
+4. Yêu cầu người dùng
+Tác nhân
+	Yêu cầu
+	Độ ưu tiên
+	VD: cửa hàng kinh doanh đồ uống: trà sữa
+	Quản lý 
+	Tôi muốn tạo cốt trà tại kho tổng, phân phối về các quầy bar để nhân viên pha chế khi có yêu cầu
+Cốt trà sẽ bao gồm các định lượng khác nhau, ví dụ: để tạo ra 10L trà, tôi phải mất 2 hộp túi lọc và 100g nhài
+	1
+	
+
+	Mỗi 1 đợt, có thể nguyên vật liệu sản xuất ra cốt có thể khác nhau
+VD: Tháng trước, tôi có sử dụng trà hãng A làm cốt, nhưng sau 1 thời gian, nhận được nhiều phản hồi từ khách về hương vị, tôi muốn sử dụng trà hãng B để làm cốt
+	2
+	
+
+	Tôi muốn quản lý tồn kho của sản phẩm cốt trà tại thời điểm hiện tại
+	1
+	
+
+	Tôi muốn xem lịch sử từng lần sản xuất/tạo cốt
+	1
+	
+
+	Vào cuối ngày, nước cốt không thể bán hết, tôi muốn hủy số lượng cốt đó do không thể tái sử dụng
+	1
+	
+
+	Tôi muốn sửa công thức tạo cốt ngày 12/12/2025 trên phần mềm do nhầm lẫn
+Tôi muốn hệ thống tự điều chỉnh lại tồn kho theo công thức đã điều chỉnh
+	1
+	
+
+	Tôi muốn xóa phiếu tạo cốt ngày 12/12/2025 do sai sót
+	2
+	
+
+	Tôi muốn sản xuất nhiều loại cốt cùng 1 thời điểm
+Mỗi ngày, tôi sản xuất 10L cốt trà, 3kg trân châu,...
+	2
+	Nhân viên
+	Khi tôi pha chế, tôi có thể pha chế nhiều loại cốt khác nhau
+Bán hàng đến đâu pha chế đến đó
+Tồn kho của cốt sẽ bị hao hụt đến đó
+=> hệ thống tự động trừ kho các nguyên liệu/cốt theo định mức pha chế của sản phẩm.
+	1
+	
+
+	Khi nhân viên pha chế thành công 1 thành phẩm, nhưng sai yêu cầu khách hàng. Tôi có thể tái sử dụng lại mặt hàng đó nếu khách sau order hoặc hủy đi khi không có khả năng tái sử dụng, chứ không cập nhật lại tồn kho của cốt được nữa
+	1
+	
+
+	Tôi muốn cấu hình lại định mức nguyên vật liệu pha chế ra 1 cốc trà 
+VD: định lượng 1 cốc trà bao gồm: nước trà, sữa, trân châu, tuy nhiên, vào cuối ngày trân châu hết, tôi có thể đổi trân châu thành thách cho khách hàng
+	3
+	Chủ cửa hàng
+	Khi xem lợi nhuận bán hàng, tôi muốn xem lợi nhuận từ sản phẩm thành phẩm Lợi nhuận cốc trà = doanh thu bán được - giá vốn của từng thành phần
+	1
+	
+
+	Tôi muốn phân quyền truy cập chức năng xem lịch sử, tạo lệnh sản xuất nước cốt 
+	2
+	
+
+5. Luồng nghiệp vụ
+  
+
+6. Danh sách công việc
+
+
+STT
+	Chức năng
+	Độ ưu tiên
+	1
+	Định nghĩa phân loại sản phẩm
+	
+
+	2
+	Thêm/Sửa sản phẩm sản xuất
+	
+
+	3
+	Xem danh sách lịch sử sản xuất
+	
+
+	4
+	Xem chi tiết phiếu sản xuất
+	
+
+	5
+	Tạo phiếu sản xuất
+	
+
+	6
+	Sửa phiếu sản xuất 
+	
+
+	7
+	Xóa phiếu sản xuất
+	
+
+	8
+	Hủy số lượng sản xuất từng phiếu sản xuất
+	
+
+	9
+	Bán hàng sản phẩm thành phẩm
+	
+
+	10
+	Bán hàng sản phẩm sản xuất
+	
+
+	11
+	Tính giá xuất kho
+	
+
+	
+
+Thiết kế CSDL
+
+
+* Chi tiết
+* Bảng sản phẩm product thêm trường, thêm giá trị 
+
+
+Tên trường
+	Kiểu dữ liệu
+	Ý nghĩa
+	is_material
+	INT
+	Có phải là NVL?
+0-không
+1-có
+	
+
+* Bảng phiếu sản xuất production
+
+
+Tên trường
+	Kiểu dữ liệu
+	Ý nghĩa
+	id
+	Int
+	ID phiếu
+	code
+	varchar
+	Mã phiếu sản xuất (duy nhất)
+	date
+	Date
+	Ngày tạo phiếu
+	create_time
+	DateTime
+	Thời gian tạo phiếu
+	update_time
+	DateTime
+	Thời gian cập nhật gần nhất
+	creator
+	Int
+	ID người tạo
+	updater
+	Int
+	ID người cập nhật
+	description
+	nvarchar(255)
+	Ghi chú
+	
+
+* Bảng chi tiết phiếu sản xuất production_detail
+Tên trường
+	Kiểu dữ liệu
+	Ý nghĩa
+	id
+	Int
+	ID bản ghi
+	production_code
+	varchar
+	Mã phiếu sản xuất
+	production_id
+	Int
+	ID phiếu sản xuất (FK tới bảng production_order)
+	product_id
+	Int
+	ID sản phẩm
+	product_code
+	varchar
+	Mã sản phẩm
+	product_product_unit_id
+	Int
+	ID biến thể sản phẩm / đơn vị bán (product_product_unit)
+	product_product_unit_name
+	varchar
+	Tên sản phẩm theo biến thể / đơn vị
+	unit_id
+	Int
+	ID đơn vị tính
+	unit_name
+	varchar
+	Tên đơn vị tính
+	warehouse_id
+	Int
+	ID kho xuất / nhập của sản phẩm
+	quantity
+	Decimal / Float
+	Số lượng sản phẩm / nguyên vật liệu
+	unit_price
+	Decimal / Float
+	ĐƠn giá
+	group_batches
+	varchar
+	Gom sản phẩm theo số lô
+	amount
+	Decimal / Float
+	Thành tiền
+đơn giá * số lượng
+	parent_id
+	Int
+	ID sản phẩm cha trong phiếu sản xuất (dùng để xác định NVL thuộc sản phẩm sản xuất nào)
+	create_time
+	DateTime
+	Thời gian tạo
+	update_time
+	DateTime
+	Thời gian cập nhật gần nhất
+	creator
+	Int
+	ID người tạo
+	updater
+	Int
+	ID người cập nhật
+	
+
+* Phiếu nhập/xuất bởi lệnh sản xuất sẽ có 1 business_type mới, thêm cho tất cả các công ty hiện tại, update bộ mẫu mặc định cho công ty mới
+* X9: Xuất kho sản xuất
+* N9: Nhập kho sản xuất
+=> Đề xuất bộ mẫu mặc định nên để riêng ra 1 tài liệu, có thể không cần lưu trong DB vì là DL dùng chung, không được thêm/sửa/xóa  (ngoại trừ phần thu chi vì thu/chi ND có thể xóa/thêm tay)
+* Thêm trường trong rs_inoutward (xem xét quy đổi chung với trường bill_id)
+Tên trường
+	Kiểu dữ liệu
+	Ý nghĩa
+	type_doc…..
+	INT
+	Loại chứng từ
+1- bán hàng
+2- Sản xuất
+	ref_id
+	INT
+	Mã chứng từ
+bán hàng: bill_id
+sản xuất: production_id
+	
+
+* Thêm trường trong rs_inoutward_detail (xem xét quy đổi chung với trường bill_product_detail_id)
+Tên trường
+	Kiểu dữ liệu
+	Ý nghĩa
+	type_doc…..
+	INT
+	Loại chứng từ
+1- bán hàng
+2- Sản xuất
+	ref_id
+	INT
+	Mã chi tiết chứng từ
+bán hàng: bill_product_id
+sản xuất: production_detail_id
+	
+
+Chi tiết
+1. Định nghĩa sản phẩm
+* Hiện tại: Có 4 loại sản phẩm:
+
+
+type
+	Ý nghĩa
+	Nghiệp vụ
+	Đánh giá
+	null/0
+	Thành phẩm
+	Là sản phẩm bán thẳng, có thể được đóng gói sẵn hoặc pha chế khi bán hàng theo định mức thành phần
+	* Nên tách ra làm 2 loại, để dễ dàng xử lý:
+* Sản phẩm thường: bán thẳng
+* Sản phẩm thành phẩm có định mức, trừ tồn kho thành phần khi bán, không có nhập/xuất/chuyển, không có tồn kho riêng
+* Thêm sản phẩm sản xuất: cài đặt cấu hình, nhập kho khi có lệnh sản xuất, xuất kho khi bán, có thể nhập kho/xuất kho/chuyển kho luân chuyển bình thường, có tồn kho riêng
+* Sản phẩm có định mức đang vướng
+* Không lưu vết thành phẩm trong phiếu xuất kho khi bán hàng. Nên khi trả hàng/ thay thế có thể nhập kho trả hàng/ thay thế bị sai
+* ND hủy hàng sau khi bán hàng (đã pha chế) mà vẫn được cộng lại tồn kho thành phần định mức => Sai, để tồn riêng, có thể hủy/tái sử dụng lại
+	1
+	Nguyên vật liệu
+	Là sản phẩm có thể bán lẻ hoặc 
+	* Gộp chung với sản phẩm thường vì đôi khi vai trò của sản phẩm có thể bị thay đổi theo thời gian
+VD: Sữa vừa có thể là sản phẩm bán thẳng, vừa là NVL cho cốc trà sữa
+	2
+	Combo
+	Là sản phẩm đóng gói, nhiều thành phần, các thành phần có thể thay đổi linh hoạt dựa theo lựa chọn của khách hàng
+	* Thiếu combo có nhiều thành phần, mỗi thành phần 1 thuế suất khác nhau
+	3
+	Liệu trình
+	Là sản phẩm đóng gói tương tự combo, nhưng có cấu hình đặc thù cho spa: theo buổi, theo số lượng,... quản lý chăm sóc khách hàng sau mua
+	* Đang chưa có phản hồi
+	4
+	Dịch vụ
+	Là sản phẩm tính tiền theo giờ: thuê mướn
+	* Đang chưa có phản hồi
+	
+
+* Đề xuất giải pháp: 
+
+
+type
+	Ý nghĩa
+	Mô tả thay đổi
+	0
+	Thường
+	* Chuyển NVL sang thường
+=> sản phẩm thường gồm: NVL + thành phẩm k định mức
+* Có 
+* nhập/xuất/chuyển/kiểm kê
+* có lô, imei,tồn kho, đơn vị tính, thuộc tính, bếp, …
+	1
+	Thành phẩm
+	* Chuyển thành phẩm có định mức sang thành phẩm
+* không có:
+* cài đặt tồn kho, nhập/xuất/chuyển,...
+* thuộc tính
+* đơn vị tính chuyển đổi
+	2
+	Combo
+	* N/A
+	3
+	Liệu trình
+	* N/A
+	4
+	Dịch vụ
+	* N/A
+	5
+	Sản xuất
+	Thêm mới
+	
+
+* Chi tiết
+* Chuyển đổi dữ liệu
+1. Lấy DS sản phẩm thành phẩm product.type=1=> Update product.is_material=0
+2. Lấy DS sản phẩm product.type=2 => Update thành product.type=1 và product.is_material=1
+3. Lấy DS sản phẩm thành phẩm có định mức product.id=  distinct (product_material.product)=> Update thành product.type=1
+* Thêm trường warehouse_id vào bảng product_material => update product_material.warehouse_id= 1 kho bất kỳ nếu kho đó thuộc cả NVL và thành phẩm định mức
+2. Thêm sản phẩm
+* Nghiệp vụ:
+* Các loại sản phẩm
+* Thường + có tích chọn NVL
+* Thành phẩm định mức: dùng cho loại hình có kho tổng sản xuất cốt, phân phối xuống các bộ phận khác
+* Sản xuất : dùng cho loại hình trà sữa pha chế khi có đơn
+* Combo
+* Liệu trình
+* Dịch vụ
+* Thêm kho hàng trong “Định mức NVL” trong sản phẩm Thành phẩm định mức => mặc định kho bán hàng, cho phép chọn lại khi bán hàng
+* Khi bán hàng, ND có thể chọn lại kho NVL
+* Màn hình
+* Drop-down Thêm sản phẩm
+  
+
+* Sản phẩm thường: thêm trường “Là nguyên vật liệu”
+  
+
+
+
+* Sản phẩm thành phẩm định mức
+  
+
+3. Thêm/Sửa sản phẩm sản xuất
+* Nghiệp vụ:
+* Cho phép người dùng tạo, cài đặt nguyên vật liệu cho sản phẩm sản xuất
+* Sản phẩm sản xuất mặc định sử dụng kho, có đơn vị tính, không có thuộc tính
+* Luồng thao tác
+  
+
+
+
+* Luồng xử lý chi tiết  
+* Màn hình
+
+
+  
+
+  
+
+STT
+	Tên trường
+	Control type
+	Mô tả
+	Tab Thông tin
+Nguồn: 
+   * product
+   * product_product_unit
+   * product_material
+	1
+	Tên sản phẩm
+	Text-box
+	   * Free text
+   * bắt buộc
+BE:
+   * product.name
+   * product_product_unit.product_name
+	2
+	Nhóm
+	combo-box
+	   * Giá trị: DS
+   * mặc định null
+   * Không bắt buộc
+BE:
+   * Lấy DS: product_group
+   * Lưu: product_product_group
+	3
+	Mã sản phẩm
+	Text-box
+	   * Cho phép nhập giá trị chữ, số
+   * mặc định null
+   * Không bắt buộc
+BE:
+   * product
+   * product_product_unit
+	4
+	mã vạch
+	Text-box
+	   * Chỉ nhận giá trị số
+   * mặc định null
+   * Không bắt buộc
+	5
+	hình ảnh
+	List image
+	   * DS hình ảnh
+   * Click “tải ảnh”: Màn hình hiển thị DS hình ảnh trên thiết bị
+	
+
+	Giá nhập
+	Text-box
+	   * Mặc định null
+   * Bắt buộc
+   * Giá trị nguyên dương >=0
+	6
+	Giá bán
+	Text-box
+	   * Mặc định null
+   * Bắt buộc
+   * Giá trị nguyên dương >=0
+	7
+	Áp dụng thuế
+	
+
+	   * Giá trị: DS thuế suất
+   * Cho phép chọn 1
+   * mặc định null
+   * Không bắt buộc
+	8
+	Giá bao gồm thuế
+	Text-box
+	   * Hiển thị khi bật button switch “Giá bán bao gồm thuế”
+   * Mặc định null
+   * Cho phép người dùng nhập số nguyên dương>0
+   * Khi nhập, HT tự động tính toán lại Giá bán = Giá bao gồm thuế * (1-%thuế suất)
+	9
+	Giảm trừ thuế
+	combo-box
+	   * Giá trị: DS mức giảm trừ thuế
+   * Cho phép chọn 1
+   * Không bắt buộc
+	10
+	Ngành nghề tính thuế
+	combo-box
+	   * Không bắt buộc
+   * Cho phép chọn 1
+   * Giá trị: DS ngành nghề tính thuế
+	11
+	Theo dõi tồn kho
+	button switch
+	   * Bắt buộc
+   * Cho phép nhập số lượng tồn khởi tạo
+   * Cho phép chọn nhiều kho
+	12
+	Đơn vị tính
+	combo-box
+	   * bắt buộc
+   * Chỉ có đơn vị tính chính, không có đơn vị tính chuyển đổi
+	Tab Vật liệu sản xuất
+Bắt buộc phải có ít nhất 1 dòng cấu hình
+	1
+	Mã sản phẩm
+	combo-box
+	   * Giá trị: DS sản phẩm nguyên vật liệu / sản phẩm sản xuất khác (Sản phẩm có tồn kho riêng)
+   * Bắt buộc
+   * Cho phép chọn 1
+   * Thông tin: Mã sản phẩm + Tên sản phẩm + đơn vị tính
+	2
+	Tên sản phẩm
+	Text
+	   * Fill theo sản phẩm được chọn
+	3
+	Đơn vị tính
+	Text
+	   * Fill theo sản phẩm được chọn
+	4
+	Số lượng
+	Text-box
+	   * Giá trị >0
+   * Mặc định: null
+   * Bắt buộc nhập
+	5
+	Kho hàng
+	combo-box
+	   * Giá trị: DS kho hàng của sản phẩm
+   * Bắt buộc
+   * Cho phép chọn 1
+	
+
+   4. Tạo phiếu sản xuất
+   * Nghiệp vụ
+   * cho phép 1 phiếu tạo nhiều thành phẩm sản xuất
+   * HT tự động fill công thức nguyên vật liệu cho từng thành phẩm sản xuất theo cấu hình sẵn
+   * ND có thể sửa công thức tùy chỉnh theo từng đợt (tạm thời chỉ cho chọn thêm NVL)
+   * Luồng thao tác
+  
+
+   * Luồng xử lý chi tiết
+  
+
+
+
+   * Màn hình
+  
+
+
+
+STT
+	Tên trường
+	Control type
+	Mô tả FE
+	Xử lý BE
+	Thông tin sản phẩm sản xuất
+	1
+	Mã phiếu
+	Text-box
+	   * Tự động sinh khi bỏ trống
+   * ND có thể nhập
+   * Mã phiếu sản xuất là duy nhất, không được  trùng
+   * CHỉ bao gồm ký tự chữ, số
+	
+
+	2
+	Ngày tạo
+	Date-picker
+	   * Mặc định = ngày hiện tại
+   * Cho phép điều chỉnh <= Ngày hiện tại
+   * Bắt buộc
+	
+
+	3
+	Ghi chú
+	Text-area
+	   * Free text
+   * Không bắt buộc
+   * Mặc định null
+	
+
+	Sản xuất sản phẩm
+Bắt buộc phải có ít nhất 1 dòng cấu hình
+Click: hiển thị DS vật liệu sản xuất ở màn hình dưới
+	DS sản phẩm sản xuất
+product.type=5
+	1
+	mã sản phẩm
+	combo-box
+	   * Giá trị: DS sản phẩm sản xuất theo ĐVT chính
+   * mặc định null
+   * Khi chọn lại, reset NVL thành NVL mới theo sản phẩm được chọn lại
+   * Cho phép chọn 1
+   * Thông tin: Mã sản phẩm + Tên sản phẩm + đơn vị tính
+	   * ppu có product.type=5 hoặc product.is_material=1
+	2
+	Tên sản phẩm
+	Text
+	   * Mặc định: sản phẩm sx 
+   * Chọn lại: Fill theo sản phẩm được chọn
+	ppu.name
+	3
+	Đơn vị tính
+	Text
+	   * Mặc định: sản phẩm sx 
+   * Fill theo sản phẩm được chọn
+	ppu.unit_name
+	4
+	Số lượng
+	Text-box
+	   * Mặc định: sản phẩm sx 
+   * Giá trị >0
+   * Bắt buộc nhập
+	
+
+	5
+	Kho hàng
+	combo-box
+	   * Mặc định: null
+   * Giá trị: DS kho hàng của sản phẩm
+   * Bắt buộc
+   * Cho phép chọn 1
+	warehouse.name
+	Vật liệu sản xuất
+Bắt buộc phải có ít nhất 1 dòng cấu hình cho 1 sản phẩm sản xuất
+	   * Lấy dữ liệu: Cấu hình NVL của từng sản phẩm sản xuất
+   * 	1
+	Mã sản phẩm
+	combo-box
+	   * Mặc định: sản phẩm sx theo cấu hình
+   * Giá trị: DS sản phẩm nguyên vật liệu / sản phẩm sản xuất khác (Sản phẩm có tồn kho riêng)
+   * Bắt buộc
+   * Cho phép chọn 1
+   * Thông tin: Mã sản phẩm + Tên sản phẩm + đơn vị tính
+	   * ppu có product.type=5 hoặc product.is_material=1
+	2
+	Tên sản phẩm
+	Text
+	   * Mặc định:NVL sx theo cấu hình
+   * Chọn lại: Fill theo sản phẩm được chọn
+	ppu.name
+	3
+	Đơn vị tính
+	Text
+	   * Mặc định: NVL sx theo cấu hình
+   * Fill theo sản phẩm được chọn
+	ppu.unit_name
+	4
+	Số lượng/1 đv
+	Text-box
+	   * Mặc định: NVL sx theo cấu hình
+   * Giá trị >0
+   * Bắt buộc nhập
+	
+
+	4
+	Tổng số lượng
+	Text-box
+	   * Mặc định: NVL sx theo cấu hình * số lượng sản phẩm sản xuất
+   * Yêu cầu chọn theo lô nếu NVL có sử dụng lô
+	
+
+	5
+	Kho hàng
+	combo-box
+	   * Mặc định: NVL sx theo cấu hình
+   * Giá trị: DS kho hàng của sản phẩm
+   * Bắt buộc
+   * Cho phép chọn 1
+	warehouse.name
+	6
+	Xóa
+	button
+	   * Click: Xóa sản phẩm khỏi danh sách
+   * Hiển thị bắt đầu từ phần tử t2
+	
+
+	7
+	Thêm dòng
+	button
+	   * Click: Thêm dòng vật liệu sản xuất mới
+	
+
+	Các button thao tác
+	
+
+	10
+	Thêm sản phẩm
+	
+
+	   * Click: thêm dòng sản phẩm sx
+	
+
+	11
+	Xóa
+	
+
+	   * Click Xóa dòng sản phẩm sx
+   * Hiển thị bắt đầu từ phần tử t2
+	
+
+	
+
+   5. Sửa phiếu sản xuất 
+   * Nghiệp vụ
+   * Cho phép sửa phiếu sản xuất
+   * Chỉ cho phép điều chỉnh lại phiếu hoành thành, không 
+   * ND có thể sửa công thức tùy chỉnh theo từng đợt (tạm thời chỉ cho chọn thêm NVL)
+   * Luồng thao tác
+  
+
+   * Luồng xử lý chi tiết
+
+
+  
+
+   * Màn hình
+  
+
+  
+
+
+
+STT
+	Tên trường
+	Control type
+	Mô tả FE
+	Xử lý BE
+	Thông tin sản phẩm sản xuất
+	1
+	Mã phiếu
+	Text-box
+	   * Tự động sinh khi bỏ trống
+   * ND có thể nhập
+   * Mã phiếu sản xuất là duy nhất, không được  trùng
+   * CHỉ bao gồm kí tự chữ, số
+	producttion.code
+	2
+	Ngày tạo
+	Date-picker
+	   * Mặc định = ngày hiện tại
+   * Cho phép điều chỉnh <= Ngày hiện tại
+   * Bắt buộc
+	producttion.date
+	3
+	Ghi chú
+	Text-area
+	   * Free text
+   * Không bắt buộc
+   * Mặc định null
+	producttion.description
+	Sản xuất sản phẩm
+Bắt buộc phải có ít nhất 1 dòng cấu hình
+	
+
+	1
+	mã sản phẩm
+	combo-box
+	   * Giá trị: DS sản phẩm sản xuất theo ĐVT chính
+   * mặc định null
+   * Cho phép chọn 1
+   * Khi chọn lại, reset NVL thành NVL mới theo sản phẩm được chọn lại
+   * Thông tin: Mã sản phẩm + Tên sản phẩm + đơn vị tính
+	
+
+	2
+	Tên sản phẩm
+	Text
+	   * Mặc định: sản phẩm sx 
+   * Chọn lại: Fill theo sản phẩm được chọn
+	
+
+	3
+	Đơn vị tính
+	Text
+	   * Mặc định: sản phẩm sx 
+   * Fill theo sản phẩm được chọn
+	
+
+	4
+	Số lượng
+	Text-box
+	   * Mặc định: sản phẩm sx 
+   * Giá trị >0
+   * Bắt buộc nhập
+	
+
+	
+
+	Đơn giá
+	Text-box
+	   * Fill= tổng (đơn giá * số lượng 1 đơn vị của từng NVL)
+   * Cho phép sửa>=0
+	
+
+	
+
+	Thành tiền
+	Text
+	   * Tự động fill= Đơn giá * số lượng
+   * Không cho phép sửa
+	
+
+	5
+	Kho hàng
+	combo-box
+	   * Mặc định: null
+   * Giá trị: DS kho hàng của sản phẩm
+   * Bắt buộc
+   * Cho phép chọn 1
+	
+
+	Vật liệu sản xuất
+Bắt buộc phải có ít nhất 1 dòng cấu hình cho 1 sản phẩm sản xuất
+	
+
+	1
+	Mã sản phẩm
+	combo-box
+	   * Mặc định: sản phẩm sx đã chọn
+   * Giá trị: DS sản phẩm nguyên vật liệu / sản phẩm sản xuất khác (Sản phẩm có tồn kho riêng)
+   * Bắt buộc
+   * Cho phép chọn 1
+   * Thông tin: Mã sản phẩm + Tên sản phẩm + đơn vị tính
+	   * 	2
+	Tên sản phẩm
+	Text
+	   * Mặc định: sản phẩm sx đã chọn
+   * Chọn lại: Fill theo sản phẩm được chọn
+	
+
+	3
+	Đơn vị tính
+	Text
+	   * Mặc định: sản phẩm sx đã chọn
+   * Fill theo sản phẩm được chọn
+	
+
+	4
+	Số lượng/1 đơn vị
+	Text-box
+	   * Mặc định: sản phẩm sx đã chọn
+   * Giá trị >0
+   * Bắt buộc nhập
+	
+
+	
+
+	Đơn giá
+	Text-box
+	   * Tự fill = giá nhập của NVL
+	
+
+	5
+	Tổng số lượng
+	Text
+	   * Tự động Fill = Số lượng của 1 đơn vị * Số lượng sản xuất
+   * Không cho phép điều chỉnh
+=> phần này FE,BE cần check config  “xuất hàng vượt quá tồn kho?” nhé
+	
+
+	6
+	Kho hàng
+	combo-box
+	   * Mặc định: sản phẩm sx đã chọn
+   * Giá trị: DS kho hàng của sản phẩm
+   * Bắt buộc
+   * Cho phép chọn 1
+	
+
+	7
+	Xóa
+	button
+	   * Click: Xóa sản phẩm khỏi danh sách
+   * Hiển thị bắt đầu từ phần tử t2
+	
+
+	8
+	Thêm dòng
+	button
+	   * Click: Thêm dòng vật liệu sản xuất mới
+	
+
+	Các button thao tác
+	
+
+	10
+	Thêm sản phẩm
+	
+
+	   * Click: thêm dòng sản phẩm sx
+	
+
+	11
+	Xóa
+	
+
+	   * Click Xóa dòng sản phẩm sx
+   * Hiển thị bắt đầu từ phần tử t2
+	
+
+	
+
+   6. Xem chi tiết phiếu sản xuất
+   * Nghiệp vụ
+   * Cho phép ND xem chi tiết phiếu sản xuất, phiếu sản xuất hiển thị đầy đủ thông tin
+   * Luồng thao tác
+  
+
+   * Luồng chi tiết
+  
+
+   * Màn hình (tương tự thêm mới/ sửa nhưng không có button Lưu)
+
+
+STT
+	Tên trường
+	Control type
+	Mô tả 
+	Thông tin sản phẩm sản xuất
+Nguồn : production, production_detail, warehouse
+	1
+	Mã phiếu
+	Text
+	   * Mã phiếu
+   * BE: production.code
+	2
+	Ngày tạo
+	Text
+	   * Ngày tạo: DD/MM/YYYY
+   * BE: production.date
+	3
+	Ghi chú
+	Text
+	   * Ghi chú
+   * BE: production.description
+	Sản xuất sản phẩm
+Lấy các bản ghi production_detail.parent_id = null
+	1
+	mã sản phẩm
+	Text
+	   * mã sản phẩm
+   * BE: production_detail.product_code
+	2
+	Tên sản phẩm
+	Text
+	   * Tên sản phẩm
+   * BE: production_detail.product_product_unit_name
+	3
+	Đơn vị tính
+	Text
+	   * Đơn vị tính
+   * BE: production_detail.unit_name
+	4
+	Số lượng
+	Text
+	   * Số lượng
+   * BE: production_detail.quantity
+	5
+	Đơn giá
+	Text
+	   * Đơn giá
+   * BE: production_detail.unit_price
+	6
+	Thành tiền
+	Text
+	   * Thành tiền
+   * BE: production_detail.amount
+	7
+	Kho hàng
+	Text
+	   * Kho hàng
+   * BE: warehouse.name theo production_detail.warehouse_id the
+	Vật liệu sản xuất
+Lấy các bản ghi production_detail.parent_id khác null, hiển thị nhóm theo production_detail.parent_id = nhau
+	8
+	Mã sản phẩm
+	Text
+	   * mã sản phẩm
+   * BE: production_detail.product_code
+	9
+	Tên sản phẩm
+	Text
+	   * Tên sản phẩm
+   * BE: production_detail.product_product_unit_name
+	10
+	Đơn vị tính
+	Text
+	   * Đơn vị tính
+   * BE: production_detail.unit_name
+	11
+	Số lượng/1 đơn vị
+	Text
+	   * Số lượng
+   * BE: production_detail.quantity
+	12
+	Đơn giá
+	Text
+	   * Đơn giá
+   * BE: production_detail.unit_price
+	13
+	Tổng số lượng
+	Text
+	   * Thành tiền
+   * BE: production_detail.amount
+	14
+	Kho hàng
+	Text
+	   * Kho hàng
+   * BE: warehouse.name theo production_detail.warehouse_id the
+	Các button thao tác
+	10
+	Thoát
+	button
+	   * Click: trở về màn hình trước
+	   7. Hủy số lượng sản xuất từng phiếu sản xuất (để sau do độ phức tạp và KH chưa có yêu cầu, có thể sẽ không cần thiết)
+   * Nghiệp vụ:
+   * cho phép hủy số lượng tồn còn lại trong phiếu (VD: cuối này không dùng hết nước sốt cần tiêu hủy)
+   8. Xóa phiếu sản xuất
+   * Nghiệp vụ
+   * Xóa phiếu sản xuất thì hệ thống tự động xóa các phiếu nhập/xuất liên quan, cập nhật lại tồn kho sản phẩm sản xuất, nguyên vật liệu
+   * Luồng thao tác
+  
+
+
+
+   * Luồng chi tiết
+     * Màn hình
+
+
+STT
+	Tên trường
+	Control type
+	Mô tả FE
+	1
+	Thông tin cảnh báo
+	Text
+	   * Bạn có chắc chắn muốn xóa phiếu sản xuất này?
+Lưu ý: Sau khi xóa, các chứng từ nhập/xuất kho liên quan sẽ bị xóa
+	2
+	Xóa
+	
+
+	   * Click: thực hiện xóa, hiển thị thông báo thành công, trở về màn hình chính
+	
+
+	Cancel/Hủy bỏ
+	
+
+	   * Click: trở về màn hình chính
+	
+
+   9. Xem danh sách lịch sử sản xuất
+   * Nghiệp vụ
+   * Cho phép người dùng xem danh sách các lệnh sản xuất
+   * Cho phpes người dùng tìm kiếm, lọc theo các tiêu chí: mã, ngày tháng,...
+   * Luồng thao tác
+  
+
+   * Luồng chi tiết
+  
+
+   * Màn hình
+   * Sub-menu
+  
+
+STT
+	Tên trường
+	Control type
+	Mô tả 
+	1
+	Lệnh sản xuất
+	button
+	   * Click: hiển thị màn hình “Danh sách phiếu sản xuất”
+	
+
+   * Danh sách
+
+
+  
+
+
+
+STT
+	Tên trường
+	Control type
+	Mô tả 
+	Thông tin sản phẩm sản xuất
+Nguồn: production, production_detail
+
+
+	1
+	Mã phiếu
+	Text
+	   * Mã phiếu sản xuất
+   * BE: production.code
+	2
+	Ngày tạo
+	Text
+	   * Ngày tạo: DD/MM/YYYY
+   * BE: production.date
+	3
+	Số mặt hàng
+	Text
+	   * Số mặt hàng
+   * BE: count ( production_detail.id) 
+ĐK: theo production.id, production_detail.parent_id=null
+	4
+	Ghi chú
+	Text
+	   * Ghi chú
+   * BE: production.date
+	Các button
+	1
+	Thêm
+	button
+	   * Click: Hiển thị popup thêm mới lệnh sản xuất
+	2
+	Sửa
+	button
+	   * Click: Hiển thị popup sửa lệnh sản xuất
+	3
+	Xóa
+	button
+	   * Click: Thực hiện xóa
+	Tìm kiếm
+	
+
+	Tìm kiếm
+	Textbox
+	   * Tìm kiếm theo mã phiếu
+   * Thao tác:
+   1. ND nhập thông tin
+   2. ND click tìm kiếm
+   3. HT hiển thị DS phiếu phù hợp với ĐK tìm kiếm
+   * BE: 
+   * mã phiếu: production.code
+	
+
+	Ngày tạo
+	Date-picker
+	   * Cấu trúc: từ ngày-đến ngày: DD/MM/YYYY - DD/MM/YYYY
+   * Giá trị: 
+   * Từ ngày <=đến ngày
+   * Từ ngày, đến ngày <= ngày hiện tại
+	Phân trang
+	
+
+   10. Bán hàng sản xuất
+   * Nghiệp vụ:
+   * Cho phép người dùng bán sản phẩm sản xuất nếu có bạt “Bán trực tiếp”
+   * Hủy hàng, thay thế, trả hàng =>cộng lại tồn kho,... như sản phẩm thông thường
+   11. Bán hàng thành phẩm
+   * Nghiệp vụ:
+   * Khi bán hàng, mặc định fill kho hàng = kho trong cài đặt sản phẩm (product_material)
+   * Cho phép người dùng chọn lại kho sản phẩm NVL khi bán, trong trường hợp NVL trong kho cài đặt hết hàng, kho khác còn hàng
+   * Trên đơn hàng, không hiển thị thành phần NVL. Khi in đơn, đẩy lên hóa đơn, không hiển thị thành phần NVL
+   * Luồng thao tác:
+   1. bán hàng thành phẩm định mức
+   2. Chọn sản phẩm thành phẩm
+   3. Click chi tiết thông tin sản phẩm
+   4. Màn hình hiển thị thông tin sản phẩm + định mức tồn kho (tab mới)
+   5. Cho phép ND chọn lại kho hàng => lưu bill_product NVL
+   6. Click xác nhận
+   7. Màn hình hiển thị lại DS sản phẩm order thông thường
+   8. ND click Bán hàng 
+   9. HT hiển thị màn hình thanh toán,....
+   10. ……
+   * màn hình: thêm tab “Định mức NVL” màn thông tin chi tiết sản phẩm khi bán hàng
+  
+  
+
+   12. Hủy hàng “Thành phẩm”
+   * Nghiệp vụ:
+   * Khi hủy/trả/sửa hàng, đối với loại hình kinh doanh mặt hàng riêng lẻ có thể cộng lại tồn kho thành phần (VD: bún đậu,..). Tuy nhiên, đối với mặt hàng trà sữa, khi bán hàng sẽ chuẩn bị phan chế:
+   * đã pha chế thì không thể cộng tồn lại thành phẩm mà thành phẩm sẽ có tồn kho riêng để tái sử dụng/ hủy bỏ 
+   * chưa pha chế thì vẫn có thể cộng tồn lại thành phần
+   * Thêm trường bill_product_id (thành phẩm) vào rs_inoutward_detail để phục vụ TH: Trả hàng thành phẩm => nhập lại tồn kho NVL của thành phẩm đó (Phần này nên tối ưu lại db có nên dùng chung với production_detail_id không?)
+=> Cần khảo sát, xem lại luồng thường không theo dõi bếp, luồng theo dõi bếp, xử lý theo từng trạng thái
+   * Đối với cửa hàng có bộ phận bếp:
+   * Xóa món khi sửa đơn => không ảnh hưởng
+   * Xóa /giảm số lượng khi trả hàng/ thay thế => Tùy chọn
+   * Nhập lại tồn kho NVL
+   * Nhập lại tồn kho TP
+   * Đổi loại phiếu xuất bán hàng => xuất hủy hàng hỏng
+   * Đối với cửa hàng không có bộ phận bếp
+   * Xóa món khi sửa đơn
+   * Chưa chế biến: không ảnh hưởng, xóa trên bếp
+   * Đang chế biến: không cho hủy
+   * Đã chế biến: nhập thành phần/ hoàn thành phẩm tại bếp (SL tại bếp) vì thời điểm này chưa trừ tồn kho

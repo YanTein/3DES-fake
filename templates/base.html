@@ -8,19 +8,48 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
-            <h2>3DES App</h2>
-            <button class="menu-btn" onclick="showSection('generate-key')">Tạo khóa</button>
-            <button class="menu-btn" onclick="showSection('encrypt-text')">Mã hóa chuỗi</button>
-            <button class="menu-btn" onclick="showSection('decrypt-text')">Giải mã chuỗi</button>
-            <button class="menu-btn" onclick="showSection('encrypt-file')">Mã hóa file TXT</button>
-            <button class="menu-btn" onclick="showSection('decrypt-file')">Giải mã file TXT</button>
-            <button class="menu-btn" onclick="showSection('list-keys')">Danh sách khóa</button>
+            <div class="sidebar-logo">
+                <span class="logo-icon">🔐</span>
+                <span class="logo-text">3DES App</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-group">
+                    <div class="nav-group-label">Khóa</div>
+                    <button class="menu-btn" onclick="showSection('generate-key')">
+                        <span class="btn-icon">🗝️</span> Tạo khóa
+                    </button>
+                    <button class="menu-btn" onclick="showSection('list-keys')">
+                        <span class="btn-icon">📋</span> Danh sách khóa
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-group-label">Văn bản</div>
+                    <button class="menu-btn" onclick="showSection('encrypt-text')">
+                        <span class="btn-icon">🔒</span> Mã hóa chuỗi
+                    </button>
+                    <button class="menu-btn" onclick="showSection('decrypt-text')">
+                        <span class="btn-icon">🔓</span> Giải mã chuỗi
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-group-label">File</div>
+                    <button class="menu-btn" onclick="showSection('encrypt-file')">
+                        <span class="btn-icon">📁</span> Mã hóa file
+                    </button>
+                    <button class="menu-btn" onclick="showSection('decrypt-file')">
+                        <span class="btn-icon">📂</span> Giải mã file
+                    </button>
+                </div>
+            </nav>
         </aside>
 
         <main class="main-content">
             <div class="header">
-                <h1>Ứng dụng mã hóa và giải mã 3DES</h1>
-                <p>Thuật toán DES/3DES được tự cài đặt từ đầu, Flask chỉ dùng làm giao diện.</p>
+                <h1>Ứng dụng mã hóa 3DES</h1>
+                <p>Hỗ trợ chế độ <span class="badge badge-ecb">ECB</span> và <span class="badge badge-cbc">CBC</span> — tự cài đặt từ đầu, không dùng thư viện crypto.</p>
             </div>
 
             {% block content %}{% endblock %}
@@ -29,26 +58,18 @@
 
     <script>
         function showSection(sectionId) {
-            const sections = document.querySelectorAll('.feature-section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-
+            document.querySelectorAll('.feature-section').forEach(s => s.style.display = 'none');
             const target = document.getElementById(sectionId);
-            if (target) {
-                target.style.display = 'block';
-            }
+            if (target) target.style.display = 'block';
 
-            const buttons = document.querySelectorAll('.menu-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            const activeBtn = Array.from(buttons).find(btn =>
-                btn.getAttribute('onclick') === `showSection('${sectionId}')`
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(
+                btn => btn.getAttribute('onclick') === `showSection('${sectionId}')`
             );
-            if (activeBtn) {
-                activeBtn.classList.add('active');
-            }
+            if (activeBtn) activeBtn.classList.add('active');
         }
+
+        // Hiện/ẩn ô IV tùy chế độ — không còn dùng, IV tự động xử lý ở backend
 
         window.onload = function () {
             showSection('generate-key');

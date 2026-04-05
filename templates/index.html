@@ -1,100 +1,290 @@
 {% extends "base.html" %}
-
 {% block title %}Trang chủ{% endblock %}
-
 {% block content %}
 
+<!-- Tạo khóa -->
 <div id="generate-key" class="feature-section">
     <div class="card">
-        <h2>Tạo khóa</h2>
-        <form action="/generate-key" method="post">
-            <label>Keynumber:</label>
-            <input type="text" name="keynumber" required>
-
-            <label>Seed:</label>
-            <input type="text" name="seed" required>
-
-            <button type="submit">Tạo và lưu khóa</button>
+        <div class="card-header"><span class="card-icon">🗝️</span><h2>Tạo khóa 3DES</h2></div>
+        <form data-ajax="/generate-key">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Keynumber</label>
+                    <input type="text" name="keynumber" placeholder="Ví dụ: key01" required>
+                </div>
+                <div class="form-group">
+                    <label>Seed <span class="optional">(tùy chọn — để trống = random)</span></label>
+                    <input type="number" name="seed" placeholder="Để trống = random ngẫu nhiên">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">🗝️ Tạo và lưu khóa</button>
+            <div class="inline-result" style="display:none;"></div>
         </form>
     </div>
 </div>
 
+<!-- Mã hóa chuỗi -->
 <div id="encrypt-text" class="feature-section">
     <div class="card">
-        <h2>Mã hóa chuỗi</h2>
-        <form action="/encrypt-text" method="post">
-            <label>Keynumber:</label>
-            <input type="text" name="keynumber" required>
-
-            <label>Nhập chuỗi cần mã hóa:</label>
-            <textarea name="text_input" rows="8" required></textarea>
-
-            <button type="submit">Mã hóa chuỗi</button>
+        <div class="card-header"><span class="card-icon">🔒</span><h2>Mã hóa chuỗi</h2></div>
+        <form data-ajax="/encrypt-text">
+            <div class="form-row form-row-3">
+                <div class="form-group">
+                    <label>Keynumber</label>
+                    <input type="text" name="keynumber" placeholder="Ví dụ: key01" required>
+                </div>
+                <div class="form-group">
+                    <label>Chế độ</label>
+                    <select name="mode" class="mode-select">
+                        <option value="ECB">ECB</option>
+                        <option value="CBC">CBC</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Định dạng output</label>
+                    <select name="encoding" class="mode-select">
+                        <option value="base64">Base64</option>
+                        <option value="hex">HEX</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nhập chuỗi cần mã hóa (tối thiểu 16 ký tự)</label>
+                <textarea name="text_input" rows="6" placeholder="Nhập văn bản cần mã hóa..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">🔒 Mã hóa</button>
+            <div class="inline-result" style="display:none;"></div>
         </form>
     </div>
 </div>
 
+<!-- Giải mã chuỗi -->
 <div id="decrypt-text" class="feature-section">
     <div class="card">
-        <h2>Giải mã chuỗi</h2>
-        <form action="/decrypt-text" method="post">
-            <label>Keynumber:</label>
-            <input type="text" name="keynumber" required>
-
-            <label>Nhập ciphertext dạng HEX:</label>
-            <textarea name="text_input" rows="8" required></textarea>
-
-            <button type="submit">Giải mã chuỗi</button>
+        <div class="card-header"><span class="card-icon">🔓</span><h2>Giải mã chuỗi</h2></div>
+        <form data-ajax="/decrypt-text">
+            <div class="form-row form-row-3">
+                <div class="form-group">
+                    <label>Keynumber</label>
+                    <input type="text" name="keynumber" placeholder="Ví dụ: key01" required>
+                </div>
+                <div class="form-group">
+                    <label>Chế độ</label>
+                    <select name="mode" class="mode-select">
+                        <option value="ECB">ECB</option>
+                        <option value="CBC">CBC</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Định dạng input</label>
+                    <select name="encoding" class="mode-select">
+                        <option value="base64">Base64</option>
+                        <option value="hex">HEX</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nhập ciphertext</label>
+                <textarea name="text_input" rows="6" placeholder="Dán chuỗi cần giải mã..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-decrypt">🔓 Giải mã</button>
+            <div class="inline-result" style="display:none;"></div>
         </form>
     </div>
 </div>
 
+<!-- Mã hóa file -->
 <div id="encrypt-file" class="feature-section">
     <div class="card">
-        <h2>Mã hóa file TXT</h2>
-        <form action="/encrypt-file" method="post" enctype="multipart/form-data">
-            <label>Keynumber:</label>
-            <input type="text" name="keynumber" required>
-
-            <label>Chọn file TXT:</label>
-            <input type="file" name="file_input" accept=".txt" required>
-
-            <button type="submit">Mã hóa file</button>
+        <div class="card-header"><span class="card-icon">📁</span><h2>Mã hóa file</h2></div>
+        <p class="card-note">Output là file <strong>.bin</strong> (raw binary). Dùng tab "Giải mã file" để giải mã lại.</p>
+        <form data-ajax="/encrypt-file" data-file="true">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Keynumber</label>
+                    <input type="text" name="keynumber" placeholder="Ví dụ: key01" required>
+                </div>
+                <div class="form-group">
+                    <label>Chế độ</label>
+                    <select name="mode" class="mode-select">
+                        <option value="ECB">ECB</option>
+                        <option value="CBC">CBC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Chọn file</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="file_input" id="encrypt-file-input" required onchange="updateFileName(this, 'encrypt-file-name')">
+                    <label for="encrypt-file-input" class="file-label">📎 Chọn file...</label>
+                    <span class="file-name" id="encrypt-file-name">Chưa chọn file</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">🔒 Mã hóa file</button>
+            <div class="inline-result" style="display:none;"></div>
         </form>
     </div>
 </div>
 
+<!-- Giải mã file -->
 <div id="decrypt-file" class="feature-section">
     <div class="card">
-        <h2>Giải mã file TXT</h2>
-        <form action="/decrypt-file" method="post" enctype="multipart/form-data">
-            <label>Keynumber:</label>
-            <input type="text" name="keynumber" required>
-
-            <label>Chọn file ciphertext:</label>
-            <input type="file" name="file_input" accept=".txt" required>
-
-            <button type="submit">Giải mã file</button>
+        <div class="card-header"><span class="card-icon">📂</span><h2>Giải mã file</h2></div>
+        <p class="card-note">Chọn file <strong>.bin</strong> đã mã hóa. Output là file gốc được khôi phục.</p>
+        <form data-ajax="/decrypt-file" data-file="true">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Keynumber</label>
+                    <input type="text" name="keynumber" placeholder="Ví dụ: key01" required>
+                </div>
+                <div class="form-group">
+                    <label>Chế độ</label>
+                    <select name="mode" class="mode-select">
+                        <option value="ECB">ECB</option>
+                        <option value="CBC">CBC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Chọn file .bin</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="file_input" id="decrypt-file-input" accept=".bin" required onchange="updateFileName(this, 'decrypt-file-name')">
+                    <label for="decrypt-file-input" class="file-label">📎 Chọn file...</label>
+                    <span class="file-name" id="decrypt-file-name">Chưa chọn file</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-decrypt">🔓 Giải mã file</button>
+            <div class="inline-result" style="display:none;"></div>
         </form>
     </div>
 </div>
 
+<!-- Danh sách khóa -->
 <div id="list-keys" class="feature-section">
     <div class="card">
-        <h2>Danh sách khóa</h2>
+        <div class="card-header"><span class="card-icon">📋</span><h2>Danh sách khóa</h2></div>
         {% if keys %}
             <div class="key-list">
                 {% for item in keys %}
                     <div class="key-item">
-                        <div><strong>Keynumber:</strong> {{ item.keynumber }}</div>
-                        <div><strong>Key:</strong> {{ item.key }}</div>
+                        <div class="key-number">{{ item.keynumber }}</div>
+                        <div class="key-value">{{ item.key }}</div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p>Chưa có khóa nào.</p>
+            <div class="empty-state">
+                <span>🗝️</span>
+                <p>Chưa có khóa nào. Hãy tạo khóa trước.</p>
+            </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+function updateFileName(input, labelId) {
+    document.getElementById(labelId).textContent =
+        input.files.length > 0 ? input.files[0].name : 'Chưa chọn file';
+}
+
+document.querySelectorAll('form[data-ajax]').forEach(form => {
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.setAttribute('data-label', btn.textContent.trim());
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const url    = this.getAttribute('data-ajax');
+        const isFile = this.getAttribute('data-file') === 'true';
+        const box    = this.querySelector('.inline-result');
+        const btn    = this.querySelector('button[type="submit"]');
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang xử lý...';
+        box.style.display = 'none';
+
+        try {
+            const resp = await fetch(url, { method: 'POST', body: new FormData(this) });
+
+            if (isFile && resp.ok) {
+                const cd = resp.headers.get('Content-Disposition') || '';
+                if (cd.includes('attachment')) {
+                    const elapsed = resp.headers.get('X-Elapsed') || '';
+                    const inSize  = resp.headers.get('X-Input-Size') || '';
+                    const outSize = resp.headers.get('X-Output-Size') || '';
+                    const blob    = await resp.blob();
+                    const fname   = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)?.[1]?.replace(/['"]/g,'') || 'output.bin';
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = fname;
+                    a.click();
+                    showResult(box, `Tải file thành công: ${fname}`, false, '✅ Hoàn thành', elapsed, inSize, outSize);
+                    return;
+                }
+            }
+
+            const html = await resp.text();
+            const doc  = new DOMParser().parseFromString(html, 'text/html');
+            const title   = doc.querySelector('.card-header h2')?.textContent || 'Kết quả';
+            const result  = doc.querySelector('.result-box')?.textContent || '';
+            const elapsed = doc.querySelector('.stat-item:nth-child(1) .stat-value')?.textContent || '';
+            const inSize  = doc.querySelector('.stat-item:nth-child(2) .stat-value')?.textContent || '';
+            const outSize = doc.querySelector('.stat-item:nth-child(3) .stat-value')?.textContent || '';
+            showResult(box, result, title.includes('Lỗi'), title, elapsed, inSize, outSize);
+
+        } catch (err) {
+            showResult(box, 'Lỗi kết nối: ' + err.message, true, '❌ Lỗi');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = btn.getAttribute('data-label');
+        }
+    });
+});
+
+function showResult(box, text, isError, title, elapsed, inSize, outSize) {
+    const stats = elapsed ? `<div class="inline-stats">
+        <span>⏱ <strong>${elapsed}</strong></span>
+        ${inSize  ? `<span>📥 ${inSize} bytes</span>`  : ''}
+        ${outSize ? `<span>📤 ${outSize} bytes</span>` : ''}
+    </div>` : '';
+    box.style.display = 'block';
+    box.innerHTML = `
+        <div class="result-title ${isError ? 'result-error' : 'result-success'}">
+            ${isError ? '❌' : '✅'} ${title || 'Kết quả'}
+        </div>
+        ${stats}
+        <pre class="result-box">${esc(text)}</pre>
+        <button type="button" class="btn btn-copy" onclick="copyResult(this)">📋 Sao chép</button>
+    `;
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function copyResult(btn) {
+    const text = btn.previousElementSibling.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = '✅ Đã sao chép!';
+            setTimeout(() => btn.textContent = '📋 Sao chép', 2000);
+        });
+    } else {
+        // Fallback cho HTTP / non-localhost
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            document.execCommand('copy');
+            btn.textContent = '✅ Đã sao chép!';
+        } catch {
+            btn.textContent = '❌ Không sao chép được';
+        }
+        document.body.removeChild(ta);
+        setTimeout(() => btn.textContent = '📋 Sao chép', 2000);
+    }
+}
+</script>
 
 {% endblock %}
