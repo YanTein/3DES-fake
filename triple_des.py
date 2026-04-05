@@ -18,6 +18,7 @@ def triple_des_encrypt_bytes(plain_data, master_key_24):
     rk2 = generate_des_round_keys(k2)
     rk3 = generate_des_round_keys(k3)
 
+    # IV ngau nhien 8-byte cho CBC, su dung CSPRNG cua he dieu hanh.
     iv = os.urandom(8)
     prev_block = iv
     result = bytearray(iv)
@@ -37,7 +38,7 @@ def triple_des_decrypt_bytes(cipher_data, master_key_24):
     if not isinstance(cipher_data, (bytes, bytearray)):
         raise TypeError("cipher_data phai la bytes hoac bytearray")
     if len(cipher_data) < 16 or len(cipher_data) % 8 != 0:
-        raise ValueError("Ciphertext CBC khong hop le")
+        raise ValueError("Ciphertext CBC khong hop le: phai co it nhat 16 bytes va chia het cho 8")
 
     k1, k2, k3 = split_3des_key(master_key_24)
 
